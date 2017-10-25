@@ -1,0 +1,6 @@
+C:\Users\Student\Source\Repos\Optimering_Oblig2\Optimering_Oblig2\bin\Debug\Optimering_Oblig2.exe.config
+C:\Users\Student\Source\Repos\Optimering_Oblig2\Optimering_Oblig2\bin\Debug\Optimering_Oblig2.exe
+C:\Users\Student\Source\Repos\Optimering_Oblig2\Optimering_Oblig2\bin\Debug\Optimering_Oblig2.pdb
+C:\Users\Student\Source\Repos\Optimering_Oblig2\Optimering_Oblig2\obj\Debug\Optimering_Oblig2.csprojResolveAssemblyReference.cache
+C:\Users\Student\Source\Repos\Optimering_Oblig2\Optimering_Oblig2\obj\Debug\Optimering_Oblig2.exe
+C:\Users\Student\Source\Repos\Optimering_Oblig2\Optimering_Oblig2\obj\Debug\Optimering_Oblig2.pdb
