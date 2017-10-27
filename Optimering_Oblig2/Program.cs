@@ -140,10 +140,16 @@ namespace Optimering_Oblig2 {
             Console.Write("Med fitness:\n");
             WriteArray(fitness);
             
+            // TEST
+            // Create random symmetric matrix and check if the graph is connect
             int[,] graphTest = new int[4,4];
-            CreateSymmetricMatrix(graphTest, graphTest.GetLength(0));
-            WriteMultiArray(graphTest, graphTest.GetLength(0), graphTest.GetLength(0));
-            CheckIfGraphConnected(graphTest, graphTest.GetLength(0));
+            bool connectedGraph = false;
+            while (!connectedGraph) {
+                CreateSymmetricMatrix(graphTest, graphTest.GetLength(0));
+                WriteMultiArray(graphTest, graphTest.GetLength(0), graphTest.GetLength(0));
+                connectedGraph = CheckIfGraphConnected(graphTest, graphTest.GetLength(0));
+            }
+            // END TEST
             
             Console.Read();
             
@@ -282,20 +288,27 @@ namespace Optimering_Oblig2 {
             }
         }
 
-        static void CheckIfGraphConnected(int[,] matrix, int length) {
+        static bool CheckIfGraphConnected(int[,] matrix, int length) {
             int[] connectedNodes = new int[length];
+            for (int i = 0; i < connectedNodes.GetLength(0); i++) {
+                connectedNodes[i] = -1;
+            }
             for (int i = 0; i < length; i++) {
                 for (int j = i; j < length; j++) {
                     if (matrix[i,j] == 1) {
                         Console.Write("{0} er koblet med {1}\n", i, j);
-                        if(!connectedNodes.Contains(i)) {
-                            connectedNodes[i] == i;
-                        }
-                        if(!connectedNodes.Contains(j)) {
-                            connectedNodes[i] == j;
-                        }
+                        connectedNodes[i] = i;
+                        connectedNodes[j] = j;
                     }
                 }
+            }
+            WriteArray(connectedNodes);
+            if (connectedNodes.Contains(-1)) {
+                Console.Write("Grafen er ikke connected!\n");
+                return false;
+            } else {
+                Console.Write("Grafen er connected!\n");
+                return true;
             }
         }
 
