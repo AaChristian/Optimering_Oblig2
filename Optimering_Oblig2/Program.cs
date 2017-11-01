@@ -12,7 +12,7 @@ namespace Optimering_Oblig2 {
         // Array for colours (Black, White, Red)
         static char[] colours = {'B', 'W', 'R'};
         // Create an 5*5 2D array (graph with 5 nodes)
-        static int[,] graph = { {0, 1, 0, 0, 1}, {1, 0, 1, 1, 0}, {0, 1, 0, 1, 1}, {0, 1, 1, 0, 0}, {1, 0, 1, 0, 0}};
+        //static int[,] graph = { {0, 1, 0, 0, 1}, {1, 0, 1, 1, 0}, {0, 1, 0, 1, 1}, {0, 1, 1, 0, 0}, {1, 0, 1, 0, 0}};
         // Create an 12*12 array (graph with 12 nodes)
         /*static int[,] graph = {
             {0,1,0,1,0,0,0,0,0,0,0,0}, // 0
@@ -28,11 +28,13 @@ namespace Optimering_Oblig2 {
             {0,0,0,0,0,0,0,1,0,0,0,1}, // 10
             {0,0,0,0,0,0,0,0,1,1,1,0}  // 11
         };*/
-        //static int[,] graph = new int[8,8];
+        static int[,] graph = new int[1000,1000];
         // Startpopulation
         static int numbOfPopulation = 4;
         // Array for fitness (4 values since max 4 solutions)
         static int[] fitness = {int.MaxValue, int.MaxValue, int.MaxValue, int.MaxValue};
+        // Starting fitness
+        static int[] fitnessStart = new int[numbOfPopulation];
         // Population (solutions array list
         static List<char[]> population = new List<char[]>();
         // Parents array
@@ -43,9 +45,14 @@ namespace Optimering_Oblig2 {
             Console.Write("Colours:\n");
             WriteArray(colours);
             // Generate random matrix (random graph)
-            //CreateSymmetricMatrix(graph, graph.GetLength(0));
+            bool connectedGraph = false;
+            while (!connectedGraph) {
+                CreateSymmetricMatrix(graph, graph.GetLength(0));
+                //WriteMultiArray(graphTest, graphTest.GetLength(0), graphTest.GetLength(0));
+                connectedGraph = CheckIfGraphConnected(graph, graph.GetLength(0));
+            }
             Console.Write("Graph matrix:\n");
-            WriteMultiArray(graph, graph.GetLength(0), graph.GetLength(0));
+            //WriteMultiArray(graph, graph.GetLength(0), graph.GetLength(0));
 
             // Populate the list with populations(solutions)
             for (int i = 0; i < numbOfPopulation; i++){
@@ -62,7 +69,7 @@ namespace Optimering_Oblig2 {
             population[1] = initSolution2;
             // Write the solutions
             Console.Write("Starting solutions:\n");
-            WriteArrayList(population);
+            //WriteArrayList(population);
 
             // Find fitness to initial solutions
             Console.Write("Find starting fitness:\n");
@@ -75,6 +82,8 @@ namespace Optimering_Oblig2 {
 
             bool stop = false;
             int iteration = 1;
+            int stagnation = 0;
+            int bestFitness = int.MaxValue;
             while(!stop) {
                 Console.Write("========== Iteration {0} ============\n", iteration);
                 // Select parents
@@ -82,25 +91,25 @@ namespace Optimering_Oblig2 {
                 // Write about selected parents
                 Console.Write("Valgte foreldre:\n");
                 Console.Write(" {0} - Fitness: {1} - Populasjon: ", parents[0], fitness[parents[0]]);
-                WriteArrayList(population, parents[0]);
+                //WriteArrayList(population, parents[0]);
                 Console.Write(" {0} - Fitness: {1} - Populasjon: ", parents[1], fitness[parents[1]]);
-                WriteArrayList(population, parents[1]);
+                //WriteArrayList(population, parents[1]);
 
                 // Crossover
                 Console.Write("--- Cross-Over ---- \n");
                 Console.Write("The childs are solutions: ");
-                WriteArray(childs);
+                //WriteArray(childs);
                 CrossOver();
                 Console.Write("Populasjonen etter Cross-Over:\n");
-                WriteArrayList(population);
+                //WriteArrayList(population);
                 // Mutation
                 Console.Write("--- Mutation ---- \n");
                 double pm = rnd.NextDouble();
                 Console.Write(pm);
-                if (pm > 0.5) {
+                if (pm > 0.9) {
                     Console.Write("\nMutasjon skjer!\n");
                     Mutation();
-                    WriteArrayList(population);
+                    //WriteArrayList(population);
                 }
                 // Calculate fitness
                 Console.Write("--- Find fitness ---- \n");
@@ -109,6 +118,9 @@ namespace Optimering_Oblig2 {
                     fitness[i] = FindFitness(population[i]);
                 }
                 WriteArray(fitness);
+                if (iteration == 1) {
+                    fitness.CopyTo(fitnessStart, 0);
+                }
 
                 // Stop criteria
                 int numberOfBestFitness = 0;
@@ -117,10 +129,24 @@ namespace Optimering_Oblig2 {
                         numberOfBestFitness++;
                     }
                 }
-                Console.Write("Number of solutions with best fitness: {0}\n", numberOfBestFitness);
+                //Console.Write("Number of solutions with best fitness: {0}\n", numberOfBestFitness);
                 // If the fitness to all the solutions is 0, stop!
                 // else if number of iterations exceeds a certain number and at least one solution has fitness 0, stop!
                 // else stop after 500 iterations if no perfect fitness is found in any solution
+                /*for (int i = 0; i < fitness.GetLength(0); i++) {
+                    if (fitness[i] < bestFitness) {
+                        bestFitness = fitness[i];
+                    }
+                }
+                if (fitness.Contains(bestFitness)) {
+                    stagnation++;
+                } else {
+                    stagnation = 0;
+                }
+                if (stagnation >= 10) {
+                    Console.Write("***** Found best fitness after {0} iterations. *****\n", iteration);
+                    stop = true;
+                }*/
                 if (numberOfBestFitness == fitness.GetLength(0)) {
                     Console.Write("***** Found perfect fitness to all solutions after {0} iterations. *****\n", iteration);
                     stop = true;
@@ -136,19 +162,21 @@ namespace Optimering_Oblig2 {
             }
             
             Console.Write("Siste populasjonen:\n");
-            WriteArrayList(population);
-            Console.Write("Med fitness:\n");
+            //WriteArrayList(population);
+            Console.Write("Starting fitness:\n");
+            WriteArray(fitnessStart);
+            Console.Write("Best fitness:\n");
             WriteArray(fitness);
             
             // TEST
             // Create random symmetric matrix and check if the graph is connect
-            int[,] graphTest = new int[4,4];
+            /*int[,] graphTest = new int[500,500];
             bool connectedGraph = false;
             while (!connectedGraph) {
                 CreateSymmetricMatrix(graphTest, graphTest.GetLength(0));
                 WriteMultiArray(graphTest, graphTest.GetLength(0), graphTest.GetLength(0));
                 connectedGraph = CheckIfGraphConnected(graphTest, graphTest.GetLength(0));
-            }
+            }*/
             // END TEST
             
             Console.Read();
@@ -171,7 +199,7 @@ namespace Optimering_Oblig2 {
                 for (int j = i; j < length; j++) {
                     if (graph[i,j] == 1) {
                         if (solution[i].Equals(solution[j])) {
-                            Console.Write("{0}({1}) og {2}({3}) er like!\n", i, solution[i], j, solution[j]);
+                            //Console.Write("{0}({1}) og {2}({3}) er like!\n", i, solution[i], j, solution[j]);
                             fitness++;
                         }
                     }
@@ -296,13 +324,13 @@ namespace Optimering_Oblig2 {
             for (int i = 0; i < length; i++) {
                 for (int j = i; j < length; j++) {
                     if (matrix[i,j] == 1) {
-                        Console.Write("{0} er koblet med {1}\n", i, j);
+                        //Console.Write("{0} er koblet med {1}\n", i, j);
                         connectedNodes[i] = i;
                         connectedNodes[j] = j;
                     }
                 }
             }
-            WriteArray(connectedNodes);
+            //WriteArray(connectedNodes);
             if (connectedNodes.Contains(-1)) {
                 Console.Write("Grafen er ikke connected!\n");
                 return false;
